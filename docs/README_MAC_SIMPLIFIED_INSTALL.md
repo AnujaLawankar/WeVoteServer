@@ -485,7 +485,11 @@ email = "samuel@adams.com"
 password = "GoodAle1776"
 ```
 
+<<<<<<< HEAD
 iii. Set `allow_create` to True, so when you run the script, changes can be made to your local database.
+=======
+3.  Set `allow_create` to True, so when you run the script, changes can be made to your local database.
+>>>>>>> d35f1471 (Updated README with better instructions for using `create_dev_user`. Iteration.)
 
 ```
 allow_create = True
