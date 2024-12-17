@@ -80,7 +80,8 @@ def retrieve_sql_files_from_master_server(request):
 
 
         for table_name in allowable_tables:
-            global_stats['table_name_text'] = ('<b>Saving</b>&nbsp;&nbsp;<i>' + table_name +
+            t1 = time.time()
+            global_stats['table_name'] = ('<b>Saving</b>&nbsp;&nbsp;<i>' + table_name +
                                           '</i>&nbsp;&nbsp;to s3 from the <b>master</b> server')
             global_stats['table_name'] = table_name
             global_stats['count'] += 1
@@ -94,10 +95,12 @@ def retrieve_sql_files_from_master_server(request):
             print(f"{global_stats['count']} -- URL to aws file {aws_s3_file_url} "
                   f"received at {int(time.time()-global_stats['global_t0'])} seconds")
 
-            global_stats['table_name_text'] = ('<b>Loading</b>&nbsp;&nbsp;<i>' + table_name +
+            # time.sleep(1)  # TODO HACK
+
+            global_stats['table_name'] = ('<b>Loading</b>&nbsp;&nbsp;<i>' + table_name +
                                           '</i>&nbsp;&nbsp;from s3 on the <b>local</b> server')
-            # restore_one_file_to_local_server(aws_s3_file_url, 'ballot_ballotitem')
-            restore_one_file_to_local_server(aws_s3_file_url, table_name)
+            restore_one_file_to_local_server(aws_s3_file_url, 'ballot_ballotitem')
+            time.sleep(1)   # TODO HACK
             global_stats['step'] += 1
             print(f"{global_stats['count']} "
                   f"-- Restored table {table_name} at {int(time.time()- global_stats['global_t0'])} seconds")
