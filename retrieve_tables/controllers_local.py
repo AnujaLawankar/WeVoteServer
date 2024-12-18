@@ -100,7 +100,6 @@ def retrieve_sql_files_from_master_server(request):
             global_stats['table_name'] = ('<b>Loading</b>&nbsp;&nbsp;<i>' + table_name +
                                           '</i>&nbsp;&nbsp;from s3 on the <b>local</b> server')
             restore_one_file_to_local_server(aws_s3_file_url, 'ballot_ballotitem')
-            time.sleep(1)   # TODO HACK
             global_stats['step'] += 1
             print(f"{global_stats['count']} "
                   f"-- Restored table {table_name} at {int(time.time()- global_stats['global_t0'])} seconds")
@@ -130,19 +129,13 @@ def restore_one_file_to_local_server(aws_s3_file_url, table_name):
 
         head, tail = os.path.split(aws_s3_file_url)
 
-        diff_t0 = int((time.time() - global_stats['global_t0']))
-        print(f"About to download {table_name} from S3 at {diff_t0} seconds")
-        tf = tempfile.NamedTemporaryFile(mode='r+b')
-        # print(f"AWS_STORAGE_BUCKET_NAME: {AWS_STORAGE_BUCKET_NAME}, tail: {tail}, tf.name: {tf.name}")
-        s3.Bucket(AWS_STORAGE_BUCKET_NAME).download_file(tail, tf.name)
-        print("Downloaded", tf.name)
-        diff_t0 = int(time.time() - global_stats['global_t0'])
-        print(f"Done with download from S3 at {diff_t0} seconds")
-    except Exception as e:
-        print("!!Problem occurred Downloading file:", e)
-        results['success'] = False,
-        results['error string'] = str(e)
-        return results
+    diff_t0 = time.time() - t0
+    print(f"About to download {table_name} from S3 at {diff_t0:.2f} seconds")
+    tf = tempfile.NamedTemporaryFile(mode='r+b')
+    s3.download_file(AWS_STORAGE_BUCKET_NAME, tail, tf.name)
+    print("Downloaded", tf.name)
+    diff_t0 = time.time() - t0
+    print("Done with download from S3 at {:.6f} seconds".format(diff_t0))
 
     try:
         db_name = get_environment_variable("DATABASE_NAME")
@@ -150,30 +143,16 @@ def restore_one_file_to_local_server(aws_s3_file_url, table_name):
         db_host = get_environment_variable('DATABASE_HOST')
         db_port = get_environment_variable('DATABASE_PORT')
 
-        diff_t0 = int(time.time() - global_stats['global_t0'])
-        print(f"About to TRUNCATE {table_name} at {diff_t0} seconds")
-        # # engine = connect_to_db()
-    except Exception as e:
-        print("!!Problem occurred getting variables for db:", e)
-        results['success'] = False,
-        results['error string'] = str(e)
-        return results
-
-    try:
-        truncate_table_psycopg2(table_name)
-        # drop_table(engine, table_name)
+        diff_t0 = time.time() - t0
+        print("About to drop_table {} at {:.6f} seconds".format(table_name, diff_t0))
+        engine = connect_to_db()
+        drop_table(engine, table_name)
 
         diff_t0 = int((time.time() - global_stats['global_t0']))
         print(f"About to pg_restore from tempfile at {diff_t0} seconds")
 
-        command_str = f"pg_restore -v --data-only --disable-triggers -U {db_user} "
-        if positive_value_exists(db_host):
-            command_str += f"-h {db_host} "
-        if positive_value_exists(db_port):
-            command_str += f"-p {db_port} "
-        command_str += f"-d {db_name} -t {table_name} "
-        command_str += f"\"{tf.name}\""
-        # print(command_str)
+        command_str = (f"pg_restore -v --data-only --disable-triggers  -h {db_host} -p {db_port} -U {db_user} "
+                       f"-d {db_name} -t {table_name} tempfile")
 
         os.system(command_str)
 
@@ -181,8 +160,7 @@ def restore_one_file_to_local_server(aws_s3_file_url, table_name):
         print(f"Restore completed at {diff_t0} seconds")
         results['success'] = True
     except Exception as e:
-        print("!!Problem occurred 2!!", e)
-        logger.error("Problem occurred in pg_restore step: ", e)
+        print("!!Problem occurred!!", e)
         results['success'] = False,
         results['error string'] = str(e)
 
