@@ -456,7 +456,7 @@ this step.  To see if postgres is already running, check with lsof in a terminal
 
 ## Set up an admin account in your local WeVoteServer database
 
-1.  Now, create an account for yourself to login to the management pages of the WeVoteServer.
+1a.  Now, create an account for yourself to login to the management pages of the WeVoteServer.
 
     At WeVote, we call end users "voters".  
 
@@ -472,27 +472,28 @@ this step.  To see if postgres is already running, check with lsof in a terminal
     [http://localhost:8000/admin/](http://localhost:8000/admin/).  Once logged in you can start synchronizing data (downloading ballot and issue 
      data from the master server in the cloud, to your local server).
     
- 
-[//]: # (1.  Open the file `WeVoteServer/voter/controllers_voter_create.py` and edit the variables to your own information.)
-[//]: # ()
-[//]: # (2.  Edit the default information in this file &#40;first_name, last_name, etc.&#41; to be personalized for yourself, with your own information:)
-[//]: # ()
-[//]: # (```)
-[//]: # (first_name = "Samuel")
-[//]: # (last_name = "Adams")
-[//]: # (email = "samuel@adams.com")
-[//]: # (password = "GoodAle1776")
-[//]: # (```)
-[//]: # ()
-[//]: # (3.  Set `allow_create` to True, so when you run the script, changes can be made to your local database.)
-[//]: # ()
-[//]: # (```)
-[//]: # (allow_create = True)
-[//]: # (```)
-[//]: # ()
-[//]: # (4.  Visit http://localhost:8000/voter/create_dev_user )
-[//]: # (    or https://wevotedeveloper.com:8000/voter/create_dev_user Once you have visited)
-[//]: # (    that page, you should have a new admin account you can sign in with.)
+1b. If you run into problems with this script, there is an alternate way to give your local account admin permissions. 
+
+i.  Open the file `WeVoteServer/voter/controllers_voter_create.py` and edit the variables to your own information.
+
+ii. Edit the default information in this file (first_name, last_name, etc.) to be personalized for yourself, with your own information:
+
+```
+first_name = "Samuel"
+last_name = "Adams"
+email = "samuel@adams.com"
+password = "GoodAle1776"
+```
+
+iii. Set `allow_create` to True, so when you run the script, changes can be made to your local database.
+
+```
+allow_create = True
+```
+
+iv. Visit http://localhost:8000/voter/create_dev_user 
+    or https://wevotedeveloper.com:8000/voter/create_dev_user Once you have visited
+    that page, you should have a new admin account you can sign in with.
 
 2.  Navigate to [http://localhost:8000/admin/](http://localhost:8000/admin/) and sign in with your new username/password.  (in the example above the user email is `samuel@adams.com` and the password is `ale`).    
 

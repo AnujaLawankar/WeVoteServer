@@ -1,0 +1,17 @@
+{# templates/import_export_google_play_store/index.html #}
+{% extends "template_base.html" %}
+
+{% block title %}Import/Export Data from Google Play Store{% endblock %}
+
+{%  block content %}
+
+<h1>Import/Export Data from Google Play Store</h1>
+
+<p>
+    In order to help manage the WeVote data lake, these tools help us migrate and look at data coming from the
+    Google Play Store.
+</p>
+    
+<a href="{% url 'import_export_google_play_store:google_play_store_event_list' %}">Google Play Store Event List</a>
+
+{% endblock %}

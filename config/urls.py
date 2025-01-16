@@ -67,6 +67,9 @@ urlpatterns = [
             include(('import_export_facebook.urls', 'import_export_facebook'), namespace="import_export_facebook")),
     re_path(r'^import_export_google_civic/', include((
         'import_export_google_civic.urls', 'import_export_google_civic'), namespace="import_export_google_civic")),
+    re_path(r'^import_export_google_play_store/',
+            include(('import_export_google_play_store.urls', 'import_export_google_play_store'),
+                    namespace="import_export_google_play_store")),
     re_path(r'^import_export_maplight/',
             include(('import_export_maplight.urls', 'import_export_maplight'), namespace="import_export_maplight")),
     re_path(r'^import_export_openreplay/',
