@@ -120,6 +120,23 @@ def restore_one_file_to_local_server(aws_s3_file_url, table_name):
         'success': False
     }
 
+    # try:
+    #     # s3 = boto3.client('s3')
+    #     session = boto3.session.Session(region_name=AWS_REGION_NAME,
+    #                                     aws_access_key_id=AWS_ACCESS_KEY_ID,
+    #                                     aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+    #     s3 = session.resource(AWS_STORAGE_SERVICE)
+
+    #     head, tail = os.path.split(aws_s3_file_url)
+
+    # diff_t0 = time.time() - t0
+    # print(f"About to download {table_name} from S3 at {diff_t0:.2f} seconds")
+    # tf = tempfile.NamedTemporaryFile(mode='r+b')
+    # s3.download_file(AWS_STORAGE_BUCKET_NAME, tail, tf.name)
+    # print("Downloaded", tf.name)
+    # diff_t0 = time.time() - t0
+    # print("Done with download from S3 at {:.6f} seconds".format(diff_t0))
+    
     try:
         # s3 = boto3.client('s3')
         session = boto3.session.Session(region_name=AWS_REGION_NAME,
@@ -129,13 +146,20 @@ def restore_one_file_to_local_server(aws_s3_file_url, table_name):
 
         head, tail = os.path.split(aws_s3_file_url)
 
-    diff_t0 = time.time() - t0
-    print(f"About to download {table_name} from S3 at {diff_t0:.2f} seconds")
-    tf = tempfile.NamedTemporaryFile(mode='r+b')
-    s3.download_file(AWS_STORAGE_BUCKET_NAME, tail, tf.name)
-    print("Downloaded", tf.name)
-    diff_t0 = time.time() - t0
-    print("Done with download from S3 at {:.6f} seconds".format(diff_t0))
+        diff_t0 = int((time.time() - global_stats['global_t0']))
+        print(f"About to download {table_name} from S3 at {diff_t0} seconds")
+        tf = tempfile.NamedTemporaryFile(mode='r+b')
+        # print(f"AWS_STORAGE_BUCKET_NAME: {AWS_STORAGE_BUCKET_NAME}, tail: {tail}, tf.name: {tf.name}")
+        s3.Bucket(AWS_STORAGE_BUCKET_NAME).download_file(tail, tf.name)
+        print("Downloaded", tf.name)
+        diff_t0 = int(time.time() - global_stats['global_t0'])
+        print(f"Done with download from S3 at {diff_t0} seconds")
+    except Exception as e:
+        print("!!Problem occurred Downloading file:", e)
+        results['success'] = False,
+        results['error string'] = str(e)
+        return results
+    
 
     try:
         db_name = get_environment_variable("DATABASE_NAME")
